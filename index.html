@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#102b4e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi Meta Semanal">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Mi Meta Semanal</title>
+<style>
+:root{--navy:#102b4e;--blue:#1d5b96;--sky:#eaf3fc;--ink:#17283d;--muted:#718096;--line:#e3eaf2;--green:#16865b;--red:#c44e52;--gold:#c58a24}
+*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{background:linear-gradient(135deg,#102b4e,#1d5b96);color:white;padding:25px 18px 22px;border-radius:0 0 24px 24px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:800;font-size:21px;letter-spacing:.2px}.week{font-size:12px;color:#d9e8f7;margin-top:5px}
+main{max-width:720px;margin:auto;padding:16px 14px 36px}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:16px;margin:0 0 14px;box-shadow:0 4px 15px #15395d0a}
+h2{font-size:16px;margin:0 0 13px;color:var(--navy)}.muted{color:var(--muted);font-size:12px}.big{font-size:29px;font-weight:800;letter-spacing:-.5px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.stat{background:#ffffff18;border:1px solid #ffffff26;border-radius:13px;padding:12px}.stat small{display:block;color:#d9e8f7;font-size:11px}.stat strong{display:block;font-size:19px;margin-top:4px}
+.progress{height:9px;background:#e8eef5;border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;background:var(--blue);border-radius:99px;width:0}
+.days{display:grid;gap:10px}.day{border:1px solid var(--line);border-radius:14px;padding:12px}.dayhead{display:flex;justify-content:space-between;align-items:center;gap:10px}.dayname{font-weight:750}.pct{font-size:12px;color:var(--blue);font-weight:750}.daygrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.daygrid div{background:#f5f8fc;border-radius:10px;padding:9px}.daygrid small{display:block;color:var(--muted);font-size:11px}.daygrid b{display:block;margin-top:3px;font-size:15px}
+label{display:block;font-size:12px;color:#52647a;margin:0 0 5px}input,select{width:100%;border:1px solid #d8e1eb;border-radius:10px;padding:11px 12px;font-size:15px;background:white;color:var(--ink);min-width:0}input:focus,select:focus{outline:2px solid #b8d6f4;border-color:var(--blue)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formrow{display:grid;grid-template-columns:1fr 110px;gap:9px;align-items:end}
+button{border:0;border-radius:11px;padding:11px 14px;background:var(--blue);color:white;font-weight:700;font-size:14px;cursor:pointer}.btnlight{background:var(--sky);color:var(--navy)}.btnred{background:#fff0f0;color:var(--red)}.btnsmall{padding:7px 10px;font-size:12px}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.expense{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.expense:last-child{border-bottom:0;padding-bottom:0}.expense input[type=checkbox]{width:20px;height:20px;accent-color:var(--green);flex:0 0 auto}.expenseinfo{flex:1;min-width:0}.expenseinfo strong{display:block;font-size:14px;overflow-wrap:anywhere}.expenseinfo small{color:var(--muted);font-size:11px}.amount{font-weight:750;white-space:nowrap}.paid .expenseinfo strong,.paid .amount{text-decoration:line-through;color:#8995a3}.empty{color:var(--muted);font-size:13px;text-align:center;padding:18px 6px}
+.footer{text-align:center;color:#8794a4;font-size:11px;padding:8px}
+@media(min-width:600px){main{padding-top:20px}.days{grid-template-columns:repeat(3,1fr)}.daygrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><div><div class="brand">Mi Meta Semanal</div><div class="week" id="weekLabel">Tu plan de jueves a sábado</div></div><div style="font-size:27px">📊</div></div>
+ <div class="stats">
+  <div class="stat"><small>Total de gastos</small><strong id="totalHeader">S/ 0.00</strong></div>
+  <div class="stat"><small>Ingresos registrados</small><strong id="incomeHeader">S/ 0.00</strong></div>
+ </div>
+</header>
+<main>
+ <section class="card">
+  <div class="muted">AVANCE PARA CUBRIR TUS GASTOS</div>
+  <div style="display:flex;justify-content:space-between;align-items:end;gap:10px;margin:7px 0 10px"><div class="big" id="remaining">S/ 0.00</div><b id="progressPct">0%</b></div>
+  <div class="progress"><span id="progressBar"></span></div>
+  <div class="muted" style="margin-top:8px" id="progressText">Registra tus gastos y tus ingresos diarios.</div>
+ </section>
+
+ <section class="card">
+  <h2>Tu meta de jueves a sábado</h2>
+  <div class="muted" style="margin:-6px 0 12px">Distribución fija del total semanal: jueves 10%, viernes 30% y sábado 60%. Si haces más o menos, el saldo se ajusta en los días siguientes.</div>
+  <div class="days" id="days"></div>
+ </section>
+
+ <section class="card">
+  <h2>Registrar ingreso del día</h2>
+  <div class="row">
+   <div><label for="incomeDay">Día</label><select id="incomeDay"><option value="0">Jueves</option><option value="1">Viernes</option><option value="2">Sábado</option></select></div>
+   <div><label for="incomeAmount">Cuánto hiciste (S/)</label><input id="incomeAmount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+  </div>
+  <div class="actions"><button id="saveIncome">Guardar ingreso</button><button class="btnlight" id="clearIncome">Limpiar día</button></div>
+  <div class="muted" style="margin-top:8px">Puedes actualizar el monto del día si registraste una cantidad equivocada.</div>
+ </section>
+
+ <section class="card">
+  <h2>Mis gastos de la semana</h2>
+  <div class="formrow">
+   <div><label for="expenseName">Nombre del gasto</label><input id="expenseName" placeholder="Ej. Alquiler, luz, mercadería"></div>
+   <div><label for="expenseAmount">Monto (S/)</label><input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+  </div>
+  <div class="actions"><button id="addExpense">+ Agregar gasto</button></div>
+  <div id="expenses" style="margin-top:8px"></div>
+ </section>
+ <section class="card">
+  <h2>Semana de trabajo</h2>
+  <label for="weekDate">Selecciona el jueves de tu semana</label>
+  <input type="date" id="weekDate">
+  <div class="actions"><button class="btnlight" id="resetWeek">Crear semana nueva</button></div>
+  <div class="muted" style="margin-top:8px">Tus datos se guardan en este dispositivo y navegador. Al cambiar de semana, puedes volver a la anterior seleccionando su jueves.</div>
+ </section>
+ <div class="footer">Mi Meta Semanal · Montos en soles peruanos (S/)</div>
+</main>
+<script>
+const KEY='miMetaSemanal_v1';
+const names=['Jueves','Viernes','Sábado'], pcts=[.10,.30,.60];
+let db=JSON.parse(localStorage.getItem(KEY)||'{}');
+function money(n){return 'S/ '+(Number(n)||0).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function isoDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function thursdayOf(d){let x=new Date(d.getFullYear(),d.getMonth(),d.getDate());let diff=(x.getDay()-4+7)%7;x.setDate(x.getDate()-diff);return isoDate(x)}
+function shiftDate(s,n){let d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return isoDate(d)}
+function currentKey(){return document.getElementById('weekDate').value}
+function week(){let k=currentKey();if(!db[k])db[k]={expenses:[],income:[0,0,0]};return db[k]}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function total(){return week().expenses.reduce((a,e)=>a+e.amount,0)}
+function incomeTotal(){return week().income.reduce((a,v)=>a+(Number(v)||0),0)}
+function fmtDate(s){return new Date(s+'T12:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'short'})}
+function render(){
+ let w=week(), t=total(), inc=incomeTotal(), rem=Math.max(0,t-inc), pct=t?Math.min(100,inc/t*100):0;
+ document.getElementById('weekLabel').textContent='Semana: '+fmtDate(currentKey())+' al '+fmtDate(shiftDate(currentKey(),2));
+ document.getElementById('totalHeader').textContent=money(t);document.getElementById('incomeHeader').textContent=money(inc);
+ document.getElementById('remaining').textContent=money(rem);document.getElementById('progressPct').textContent=Math.round(pct)+'%';
+ document.getElementById('progressBar').style.width=pct+'%';
+ document.getElementById('progressText').textContent=inc>=t&&t>0?'¡Meta semanal alcanzada!':`Has generado ${money(inc)} de ${money(t)}. Te falta ${money(rem)}.`;
+ let cumulative=0, cards='';
+ names.forEach((n,i)=>{
+   let targetBefore=t*pcts.slice(0,i).reduce((a,b)=>a+b,0);
+   let targetThrough=t*pcts.slice(0,i+1).reduce((a,b)=>a+b,0);
+   let actualBefore=w.income.slice(0,i).reduce((a,b)=>a+(Number(b)||0),0);
+   let suggested=Math.max(0,targetThrough-actualBefore);
+   let original=t*pcts[i], actual=Number(w.income[i])||0;
+   let leftAfter=Math.max(0,t-w.income.slice(0,i+1).reduce((a,b)=>a+(Number(b)||0),0));
+   cards+=`<div class="day"><div class="dayhead"><span class="dayname">${n}</span><span class="pct">${pcts[i]*100}% del total</span></div>
+    <div class="daygrid"><div><small>Meta original</small><b>${money(original)}</b></div><div><small>Meta ajustada del día</small><b>${money(suggested)}</b></div><div><small>Ingreso registrado</small><b>${money(actual)}</b></div><div><small>Falta después de hoy</small><b>${money(leftAfter)}</b></div></div></div>`;
+ });
+ document.getElementById('days').innerHTML=cards;
+ let list=w.expenses;
+ document.getElementById('expenses').innerHTML=list.length?list.map((e,i)=>`<div class="expense ${e.paid?'paid':''}"><input type="checkbox" ${e.paid?'checked':''} aria-label="Marcar ${escapeHtml(e.name)} como pagado" onchange="togglePaid(${i},this.checked)"><div class="expenseinfo"><strong>${escapeHtml(e.name)}</strong><small>${e.paid?'Pagado':'Pendiente de pago'}</small></div><span class="amount">${money(e.amount)}</span><button class="btnsmall btnred" onclick="deleteExpense(${i})" aria-label="Eliminar gasto">✕</button></div>`).join(''):`<div class="empty">Todavía no agregas gastos.</div>`;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+window.togglePaid=(i,v)=>{week().expenses[i].paid=v;save()};
+window.deleteExpense=i=>{if(confirm('¿Eliminar este gasto?')){week().expenses.splice(i,1);save()}};
+document.getElementById('addExpense').onclick=()=>{let name=document.getElementById('expenseName').value.trim(),amount=Number(document.getElementById('expenseAmount').value);if(!name||!(amount>0)){alert('Escribe el nombre y un monto mayor que cero.');return}week().expenses.push({name,amount,paid:false});document.getElementById('expenseName').value='';document.getElementById('expenseAmount').value='';save()};
+document.getElementById('saveIncome').onclick=()=>{let i=Number(document.getElementById('incomeDay').value),v=Number(document.getElementById('incomeAmount').value);if(!Number.isFinite(v)||v<0){alert('Ingresa un monto válido.');return}week().income[i]=v;document.getElementById('incomeAmount').value='';save()};
+document.getElementById('clearIncome').onclick=()=>{let i=Number(document.getElementById('incomeDay').value);week().income[i]=0;save()};
+document.getElementById('weekDate').onchange=()=>{let d=new Date(currentKey()+'T12:00:00');if(d.getDay()!==4){alert('Selecciona un jueves para iniciar la semana.');document.getElementById('weekDate').value=thursdayOf(d)}save()};
+document.getElementById('resetWeek').onclick=()=>{let k=currentKey();if(confirm('¿Crear o reiniciar los datos de esta semana? Si ya existen, se borrarán.')){db[k]={expenses:[],income:[0,0,0]};save()}};
+let today=new Date();document.getElementById('weekDate').value=thursdayOf(today);render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
